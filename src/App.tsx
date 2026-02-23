@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import FeeCalculator from './components/FeeCalculator';
 import SettingsPanel from './components/SettingsPanel';
 import { AppSettings, DEFAULT_SETTINGS } from './types';
-import { Settings, Calculator, Coins } from 'lucide-react';
+import { Settings, Calculator, Coins, ShieldAlert } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'settings'>('calculator');
@@ -68,6 +68,39 @@ export default function App() {
       }));
     }
   };
+
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const handleError = (error: ErrorEvent) => {
+      console.error('Captured app error:', error);
+      setHasError(true);
+    };
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-red-100 p-8 text-center space-y-6">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+            <ShieldAlert className="w-8 h-8 text-red-600" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-slate-800">Something went wrong</h2>
+            <p className="text-slate-500">The application encountered an unexpected error. This often happens due to temporary network issues or corrupted settings.</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-blue-200"
+          >
+            Reload Application
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 pb-12">

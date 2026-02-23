@@ -76,9 +76,11 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
     }));
   };
 
-  const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem('settings_authorized') === 'true');
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleAuthorize = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +88,6 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
 
     if (passwordInput === correctPassword) {
       setIsAuthorized(true);
-      sessionStorage.setItem('settings_authorized', 'true');
       setError('');
     } else {
       setError('Incorrect password. Please try again.');
@@ -96,7 +97,6 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
 
   const handleLock = () => {
     setIsAuthorized(false);
-    sessionStorage.removeItem('settings_authorized');
     setPasswordInput('');
   };
 
@@ -119,6 +119,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                 placeholder="Enter password"
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all ${error ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
                 autoFocus
+                autoComplete="current-password"
               />
               {error && (
                 <div className="flex items-center gap-1.5 text-red-600 text-xs mt-2 px-1">
@@ -139,9 +140,6 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
       </div>
     );
   }
-
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleSyncToCode = async () => {
     setIsSyncing(true);
@@ -244,11 +242,11 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
 
         <div className="space-y-6">
           {(settings.programs || []).map((program) => (
-            <div key={program.id} className="border border-slate-200 rounded-xl overflow-hidden">
+            <div key={program?.id} className="border border-slate-200 rounded-xl overflow-hidden">
               <div className="bg-slate-50 p-4 border-b border-slate-200 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
                 <input
                   type="text"
-                  value={program.name}
+                  value={program?.name || ''}
                   onChange={(e) => updateProgram(program.id, 'name', e.target.value)}
                   className="flex-1 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-800 min-w-[200px]"
                   placeholder="Program Name (e.g., Quran Program)"
@@ -275,18 +273,18 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
               </div>
 
               <div className="p-4 space-y-3">
-                {program.grades.length > 0 && (
+                {(program?.grades?.length || 0) > 0 && (
                   <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 px-1">
                     <div className="col-span-12">Level / Grade List</div>
                   </div>
                 )}
 
-                {program.grades.map((grade) => (
-                  <div key={grade.id} className="grid grid-cols-12 gap-2 items-center">
+                {(program?.grades || []).map((grade) => (
+                  <div key={grade?.id} className="grid grid-cols-12 gap-2 items-center">
                     <div className="col-span-5">
                       <input
                         type="text"
-                        value={grade.name}
+                        value={grade?.name || ''}
                         onChange={(e) => updateGrade(program.id, grade.id, 'name', e.target.value)}
                         className="w-full px-2 py-1.5 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="Grade Name"
@@ -296,7 +294,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                       <input
                         type="number"
                         min="0"
-                        value={grade.fee}
+                        value={grade?.fee || 0}
                         onChange={(e) => updateGrade(program.id, grade.id, 'fee', Number(e.target.value))}
                         className="w-full px-2 py-1.5 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="Fee"
@@ -306,7 +304,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                       <input
                         type="number"
                         min="0"
-                        value={grade.discountedFee}
+                        value={grade?.discountedFee || 0}
                         onChange={(e) => updateGrade(program.id, grade.id, 'discountedFee', Number(e.target.value))}
                         className="w-full px-2 py-1.5 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="Discounted"
@@ -397,10 +395,10 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
           onClick={handleSyncToCode}
           disabled={isSyncing}
           className={`relative z-10 w-full font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 ${syncStatus === 'success'
-              ? 'bg-green-500 hover:bg-green-600'
-              : syncStatus === 'error'
-                ? 'bg-red-500 hover:bg-red-600'
-                : 'bg-white text-blue-900 hover:bg-blue-50'
+            ? 'bg-green-500 hover:bg-green-600'
+            : syncStatus === 'error'
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-white text-blue-900 hover:bg-blue-50'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isSyncing ? (
