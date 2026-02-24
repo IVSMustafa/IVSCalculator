@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppSettings, Program, GradeFee } from '../types';
-import { Building2, Phone, Mail, Globe, Image as ImageIcon, BookOpen, Plus, Trash2, Lock, Unlock, ShieldAlert, HelpCircle, Database, CloudLightning, ShieldCheck, ShieldQuestion } from 'lucide-react';
+import { Building2, Phone, Mail, Globe, Image as ImageIcon, BookOpen, Plus, Trash2, Lock, Unlock, ShieldAlert, HelpCircle, Database, CloudLightning, ShieldCheck, ShieldQuestion, Save } from 'lucide-react';
 
 interface Props {
   settings: AppSettings;
@@ -25,7 +25,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
 
   const addProgram = () => {
     const newProgram: Program = {
-      id: `prog-${Date.now()}`,
+      id: `prog - ${Date.now()} `,
       name: 'New Program',
       pricingType: 'class',
       grades: []
@@ -48,7 +48,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
       if (p.id === programId) {
         return {
           ...p,
-          grades: [...p.grades, { id: `grade-${Date.now()}`, name: 'New Entry', fee: 0, discountedFee: 0 }]
+          grades: [...p.grades, { id: `grade - ${Date.now()} `, name: 'New Entry', fee: 0, discountedFee: 0 }]
         };
       }
       return p;
@@ -117,7 +117,7 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 placeholder="Enter password"
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all ${error ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
+                className={`w - full px - 4 py - 3 border rounded - xl focus: ring - 2 focus: ring - blue - 500 outline - none transition - all ${error ? 'border-red-300 bg-red-50' : 'border-slate-300'} `}
                 autoFocus
                 autoComplete="current-password"
               />
@@ -306,9 +306,23 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                     <option value="subject">By Subject</option>
                     <option value="days">By Days</option>
                   </select>
+
+                  <button
+                    onClick={handleSyncToCode}
+                    disabled={isSyncing}
+                    className={`flex items - center gap - 2 text - xs font - bold px - 3 py - 1.5 rounded - lg transition - all shadow - sm ${syncStatus === 'success'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      } disabled: opacity - 50`}
+                    title="Save this change to Global Website"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    {syncStatus === 'success' ? 'Saved ✓' : 'Save Globally'}
+                  </button>
+
                   <button
                     onClick={() => removeProgram(program.id)}
-                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1"
                     title="Remove Program"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -422,8 +436,8 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
 
         <div className="relative z-10 space-y-8">
           <div className="flex items-start gap-6">
-            <div className={`p-4 rounded-2xl shadow-inner ${syncStatus === 'success' ? 'bg-green-500/20 border border-green-400/30' : 'bg-white/10 border border-white/20'}`}>
-              <Database className={`w-8 h-8 ${syncStatus === 'success' ? 'text-green-400' : 'text-blue-200'}`} />
+            <div className={`p - 4 rounded - 2xl shadow - inner ${syncStatus === 'success' ? 'bg-green-500/20 border border-green-400/30' : 'bg-white/10 border border-white/20'} `}>
+              <Database className={`w - 8 h - 8 ${syncStatus === 'success' ? 'text-green-400' : 'text-blue-200'} `} />
             </div>
             <div className="flex-1">
               <h3 className="text-2xl font-black tracking-tight">Sync to Global Website</h3>
@@ -440,12 +454,12 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
               <button
                 onClick={handleSyncToCode}
                 disabled={isSyncing}
-                className={`w-full font-black py-6 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-4 text-xl ${syncStatus === 'success'
-                  ? 'bg-green-500 hover:bg-green-600 text-white'
-                  : syncStatus === 'error'
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-white text-blue-900 hover:brightness-110 active:scale-[0.98]'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`w - full font - black py - 6 rounded - 2xl transition - all shadow - xl flex items - center justify - center gap - 4 text - xl ${syncStatus === 'success'
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    : syncStatus === 'error'
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : 'bg-white text-blue-900 hover:brightness-110 active:scale-[0.98]'
+                  } disabled: opacity - 50 disabled: cursor - not - allowed`}
               >
                 {isSyncing ? (
                   <div className="w-8 h-8 border-4 border-blue-900/20 border-t-blue-900 rounded-full animate-spin"></div>
