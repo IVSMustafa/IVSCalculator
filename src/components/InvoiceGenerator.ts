@@ -35,16 +35,21 @@ interface InvoiceData {
   exchangeRate: number;
 }
 
-
 const HEADER_URL = "templates/Header.jpg";
 const SCAN_URL = "templates/Scan%20to%20pay.jpg";
 const STAMP_URL = "templates/Stamp%20and%20signature.jpg";
 
-const NAVY: [number, number, number] = [41, 58, 128];
+// Refined Color Palette for a Premium Look
+const NAVY: [number, number, number] = [34, 50, 105]; // Slightly deeper, sleeker navy
 const DARK_BLUE: [number, number, number] = [25, 40, 100];
+const ACCENT_RED: [number, number, number] = [180, 0, 0];
+const TEXT_GRAY: [number, number, number] = [100, 100, 100];
+
 const FOOTER_H = 17;
 const PAGE_W = 210;
 const PAGE_H = 297;
+const MARGIN = 15;
+const CONTENT_W = PAGE_W - MARGIN * 2; // 180
 const CONTENT_BOTTOM_SAFE = FOOTER_H + 8;
 
 async function urlToDataUrl(url: string): Promise<string> {
@@ -72,16 +77,6 @@ async function getImageSize(dataUrl: string): Promise<{ w: number; h: number }> 
   });
 }
 
-function fitBox(srcW: number, srcH: number, boxW: number, boxH: number) {
-  const srcRatio = srcW / srcH;
-  const boxRatio = boxW / boxH;
-  if (srcRatio > boxRatio) {
-    return { w: boxW, h: boxW / srcRatio };
-  } else {
-    return { w: boxH * srcRatio, h: boxH };
-  }
-}
-
 async function addHeader(doc: jsPDF) {
   const headerImg = await urlToDataUrl(HEADER_URL);
   const { w, h } = await getImageSize(headerImg);
@@ -98,23 +93,17 @@ function drawFooter(doc: jsPDF, settings: AppSettings) {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(`${settings.phone || "+92 305 5245551"}`, 18, footerY + 10);
+  doc.text(`${settings.phone || "+92 305 5245551"}`, MARGIN, footerY + 10);
   doc.text(`${settings.email || "acivs2021@gmail.com"}`, PAGE_W / 2, footerY + 10, { align: "center" });
-  doc.text(`${settings.website || "iqravirtualschool.com"}`, PAGE_W - 18, footerY + 10, { align: "right" });
+  doc.text(`${settings.website || "iqravirtualschool.com"}`, PAGE_W - MARGIN, footerY + 10, { align: "right" });
 }
 
 function ensureSpace(doc: jsPDF, y: number, need: number) {
   if (y + need > PAGE_H - CONTENT_BOTTOM_SAFE) {
     doc.addPage();
-    return 15;
+    return MARGIN;
   }
   return y;
-}
-
-function drawHR(doc: jsPDF, y: number, x1 = 15, x2 = 195) {
-  doc.setDrawColor(180, 180, 180);
-  doc.setLineWidth(0.2);
-  doc.line(x1, y, x2, y);
 }
 
 export const generateInvoicePDF = async (data: InvoiceData) => {
@@ -122,21 +111,21 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
   const { settings } = data;
 
   // ===== Page 1 Header =====
-  let y = 15;
+  let y = MARGIN;
   try {
     const headerH = await addHeader(doc);
-    y = headerH + 6;
+    y = headerH + 10; // Added slightly more breathing room below header
   } catch (e) {
     console.error("Header load failed", e);
-    y = 20;
+    y = 25;
   }
 
   // ===== Title =====
-  doc.setFont("helvetica", "bolditalic");
-  doc.setFontSize(26);
+  doc.setFont("helvetica", "bold"); // Removed italic for a more modern, sturdy look
+  doc.setFontSize(24);
   doc.setTextColor(DARK_BLUE[0], DARK_BLUE[1], DARK_BLUE[2]);
-  doc.text("FEE INVOICE", 105, y, { align: "center" });
-  y += 9;
+  doc.text("FEE INVOICE", PAGE_W / 2, y, { align: "center" });
+  y += 12;
 
   const formatN = (num: number) => {
     const rate = data.exchangeRate || 1;
@@ -147,57 +136,64 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
     return `${data.currency} ${formatN(num)}`;
   };
 
-  // ===== Info Fields =====
-  doc.setFontSize(11);
+  // ===== Info Fields (Perfectly Aligned Grid) =====
+  const leftLabelX = MARGIN;
+  const leftValueX = MARGIN + 32;
+  const rightLabelX = 145;
+  const rightValueX = PAGE_W - MARGIN; // Right-aligned to margin for crisp edge
+
+  // Row 1
+  doc.setFontSize(10);
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
+  doc.setFont("helvetica", "normal");
+  doc.text("Parent's Name:", leftLabelX, y);
+  
   doc.setTextColor(0, 0, 0);
-
   doc.setFont("helvetica", "bold");
-  doc.text("Parent's Name :", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(data.parentName || ""), 56, y);
+  doc.text(String(data.parentName || ""), leftValueX, y);
 
-  doc.setFont("helvetica", "bold");
-  doc.text("Issued on:", 133, y);
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
   doc.setFont("helvetica", "normal");
-  doc.text(String(data.issuedOn || ""), 156, y);
-
-  y += 8;
-
-  doc.setFont("helvetica", "bold");
-  doc.text("F.Code:", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(data.fCode || ""), 40, y);
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Due Date:", 133, y);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(200, 0, 0);
-  doc.text(String(data.dueDate || ""), 156, y);
+  doc.text("Issued on:", rightLabelX, y);
+  
   doc.setTextColor(0, 0, 0);
-
-  y += 8;
-
   doc.setFont("helvetica", "bold");
-  doc.text("Currency:", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${data.currency} (1 SAR = ${data.exchangeRate.toFixed(4)} ${data.currency})`, 40, y);
+  doc.text(String(data.issuedOn || ""), rightValueX, y, { align: "right" });
+  y += 7;
 
-  y += 12;
+  // Row 2
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
+  doc.setFont("helvetica", "normal");
+  doc.text("F.Code:", leftLabelX, y);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold");
+  doc.text(String(data.fCode || ""), leftValueX, y);
+
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
+  doc.setFont("helvetica", "normal");
+  doc.text("Due Date:", rightLabelX, y);
+  
+  doc.setTextColor(ACCENT_RED[0], ACCENT_RED[1], ACCENT_RED[2]);
+  doc.setFont("helvetica", "bold");
+  doc.text(String(data.dueDate || ""), rightValueX, y, { align: "right" });
+  y += 7;
+
+  // Row 3
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
+  doc.setFont("helvetica", "normal");
+  doc.text("Currency:", leftLabelX, y);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${data.currency} (1 SAR = ${data.exchangeRate.toFixed(4)} ${data.currency})`, leftValueX, y);
+  
+  y += 14; // Padding before table
 
   // ===== Fee Table =====
-  // COLUMN WIDTHS — total usable = 180mm (margins 15+15)
-  // Col 0 Reg No:       9mm   (always "N/A")
-  // Col 1 Description:  48mm  (description text)
-  // Col 2 Grade:        34mm  (needs to fit "Regular Schooling - FS1 to FS3")
-  // Col 3 Regular Fee:  21mm
-  // Col 4 After Disc:   19mm
-  // Col 5 Month:        22mm  (needs to fit "February 2026" on one line)
-  // Col 6 Amount:       27mm  (fits "PKR 36488.78" + SAR line)
-  // Total: 9+48+34+21+19+22+27 = 180 ✓
-
   const tableHead = [
     [
-      { content: "Reg\nNo", styles: { halign: "left" as const } },
+      { content: "Reg No", styles: { halign: "left" as const } },
       { content: "Description", styles: { halign: "left" as const } },
       { content: "Grade", styles: { halign: "left" as const } },
       { content: `Regular Fee\n(${data.currency})`, styles: { halign: "right" as const } },
@@ -260,15 +256,7 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
   }
   if (data.enrollmentDiscountAmount > 0) {
     const txt = `-${formatC(data.enrollmentDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.enrollmentDiscountAmount.toFixed(2)} SAR)` : ''}`;
-    rows.push([
-      "",
-      "Enrollment Discount\n(Sibling + Multi-Program)",
-      "",
-      "",
-      "",
-      "",
-      txt,
-    ]);
+    rows.push(["", "Enrollment Discount\n(Sibling + Multi-Program)", "", "", "", "", txt]);
   }
   if (data.fixedDiscountAmount > 0) {
     const txt = `-${formatC(data.fixedDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.fixedDiscountAmount.toFixed(2)} SAR)` : ''}`;
@@ -280,7 +268,6 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
   const hasDiscount = totalSavings > 0.01;
 
   if (hasDiscount) {
-    // Split SAR conversion onto a new line for readability
     const savingsBase = `-${formatC(totalSavings)}`;
     const savingsExtra = data.currency !== "SAR" ? `\n(-${totalSavings.toFixed(2)} SAR)` : "";
     const savingsTxt = `${savingsBase}${savingsExtra}`;
@@ -289,11 +276,11 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
       {
         content: `Total Savings (${savingsPercent.toFixed(1)}% of regular fee)`,
         colSpan: 6,
-        styles: { fontStyle: "bold", textColor: [0, 120, 60], halign: "left" },
+        styles: { fontStyle: "bold", textColor: [0, 150, 75], halign: "right" },
       },
       {
         content: savingsTxt,
-        styles: { fontStyle: "bold", textColor: [0, 120, 60], halign: "right" },
+        styles: { fontStyle: "bold", textColor: [0, 150, 75], halign: "right" },
       },
     ]);
 
@@ -305,33 +292,31 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
       {
         content: "Total (Without Discount)",
         colSpan: 6,
-        styles: { fontStyle: "bold", halign: "left" },
+        styles: { fontStyle: "bold", halign: "right" },
       },
       { content: normalTotalTxt, styles: { fontStyle: "bold", halign: "right" } },
     ]);
   }
 
-  // Total Payable — split SAR conversion to next line
   const totalPayableBase = formatC(data.finalAmount);
-  const totalPayableExtra =
-    data.currency !== "SAR" ? `\n(${data.finalAmount.toFixed(2)} SAR)` : "";
+  const totalPayableExtra = data.currency !== "SAR" ? `\n(${data.finalAmount.toFixed(2)} SAR)` : "";
   const totalPayableTxt = `${totalPayableBase}${totalPayableExtra}`;
 
   rows.push([
     {
-      content: hasDiscount ? "Total Payable (After Discount)" : "Total Payable",
+      content: hasDiscount ? "TOTAL PAYABLE (After Discount)" : "TOTAL PAYABLE",
       colSpan: 6,
-      styles: { fontStyle: "bold", fontSize: 9, halign: "left" },
+      styles: { fontStyle: "bold", fontSize: 10, halign: "right" },
     },
     {
       content: totalPayableTxt,
-      styles: { fontStyle: "bold", fontSize: 9, halign: "right" },
+      styles: { fontStyle: "bold", fontSize: 10, halign: "right" },
     },
   ]);
 
   autoTable(doc, {
     startY: y,
-    margin: { left: 15, right: 15, top: 15, bottom: CONTENT_BOTTOM_SAFE },
+    margin: { left: MARGIN, right: MARGIN, bottom: CONTENT_BOTTOM_SAFE },
     theme: "plain",
     head: tableHead,
     body: rows,
@@ -339,69 +324,53 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
     headStyles: {
       fillColor: NAVY,
       textColor: [255, 255, 255],
-      fontStyle: "bolditalic",
-      fontSize: 7.5,
-      cellPadding: { top: 3, right: 2.5, bottom: 3, left: 2.5 },
+      fontStyle: "bold",
+      fontSize: 8,
+      cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
       halign: "left",
       valign: "middle",
-      minCellHeight: 12,
     },
 
     styles: {
       font: "helvetica",
-      fontSize: 8,                          // ← reduced from 8.5 → 8 for less crowding
-      cellPadding: { top: 3.5, right: 2.5, bottom: 3.5, left: 2.5 },  // ← more breathing room
+      fontSize: 8,
+      cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
       lineWidth: 0,
-      textColor: [0, 0, 0],
+      textColor: [30, 30, 30],
       valign: "middle",
       overflow: "linebreak",
     },
 
     columnStyles: {
-      0: { cellWidth: 9, halign: "left" },   // Reg No  (always "N/A")
-      1: { cellWidth: 48, halign: "left" },   // Description
-      2: { cellWidth: 34, halign: "left" },   // Grade — wide enough for "Regular Schooling - FS1 to FS3"
-      3: { cellWidth: 21, halign: "right" },  // Regular Fee
-      4: { cellWidth: 19, halign: "right" },  // After Discount
-      5: { cellWidth: 22, halign: "center" }, // Month — wide enough for "February 2026"
-      6: { cellWidth: 27, halign: "right" },  // Amount
+      0: { cellWidth: 12, halign: "left" }, 
+      1: { cellWidth: 48, halign: "left" }, 
+      2: { cellWidth: 32, halign: "left" }, 
+      3: { cellWidth: 22, halign: "right" },
+      4: { cellWidth: 20, halign: "right" },
+      5: { cellWidth: 20, halign: "center" },
+      6: { cellWidth: 26, halign: "right" },
     },
 
-    pageBreak: "auto",
-    rowPageBreak: "auto",
-
     didParseCell: (hook) => {
-      // Subtle zebra
-      if (hook.section === "body" && hook.row.index % 2 === 1) {
-        hook.cell.styles.fillColor = [245, 247, 252];
+      // Clean subtle borders for rows instead of zebra striping for a more premium look
+      if (hook.section === "body") {
+        hook.cell.styles.lineWidth = { bottom: 0.1 };
+        hook.cell.styles.lineColor = [220, 220, 220];
       }
 
-      // Total Payable row — highlighted background
+      // Total Payable row styling
       if (hook.section === "body" && hook.row.index === rows.length - 1) {
-        hook.cell.styles.fontStyle = "bold";
-        hook.cell.styles.fillColor = [235, 238, 248];
-        hook.cell.styles.lineWidth = { top: 0.6, bottom: 0, left: 0, right: 0 };
+        hook.cell.styles.fillColor = [240, 244, 250]; // Very light, elegant blue tint
+        hook.cell.styles.lineWidth = { top: 0.5, bottom: 0.5 };
         hook.cell.styles.lineColor = NAVY;
+        hook.cell.styles.textColor = NAVY;
       }
 
-      // Discount rows in green
+      // Green text for discounts
       if (hook.section === "body") {
         const cellContent = typeof hook.cell.raw === "string" ? hook.cell.raw : "";
         if (cellContent.startsWith("-")) {
-          hook.cell.styles.textColor = [0, 120, 60];
-          hook.cell.styles.fontStyle = "bold";
-        }
-      }
-
-      // After Discount column — highlight when reduced
-      if (hook.section === "body" && hook.column.index === 4) {
-        const regFeeArr = hook.row.cells[3].text;
-        const aftDiscArr = hook.cell.text;
-        const regFee = Array.isArray(regFeeArr) ? regFeeArr.join("") : regFeeArr;
-        const aftDisc = Array.isArray(aftDiscArr) ? aftDiscArr.join("") : aftDiscArr;
-
-        if (aftDisc !== "-" && regFee !== aftDisc) {
-          hook.cell.styles.textColor = [0, 80, 180];
+          hook.cell.styles.textColor = [0, 150, 75];
           hook.cell.styles.fontStyle = "bold";
         }
       }
@@ -409,90 +378,98 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
   });
 
   y = (doc as any).lastAutoTable?.finalY ?? (y + 50);
-  y += 10;
+  y += 12;
 
   // ===== Payment Information =====
-  y = ensureSpace(doc, y, 65);
+  y = ensureSpace(doc, y, 70);
 
+  // Sleek section header
   doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
-  doc.rect(15, y, 180, 9, "F");
+  doc.rect(MARGIN, y, CONTENT_W, 8, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text("Payment Information", 105, y + 6.5, { align: "center" });
-  y += 14;
+  doc.setFontSize(10);
+  doc.text("PAYMENT INFORMATION", PAGE_W / 2, y + 5.5, { align: "center" });
+  y += 12;
 
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(7.8);
+  doc.setTextColor(30, 30, 30);
+  
+  // Clean 3-column layout
+  const col1X = MARGIN + 2;
+  const col2X = MARGIN + 65;
+  const col3X = PAGE_W - MARGIN - 2; // Right aligned for the QR section
 
-  const col1X = 15;
-  const col2X = 80;
-  const col3X = 150;
-
+  // Column 1
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
-  doc.text("Account Title: IQRA VIRTUALSOLUTIONS", col1X, y);
+  doc.text("IQRA VIRTUALSOLUTIONS", col1X, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
   const col1Lines = [
-    "Account IBAN#: PK71MEZN0007810111367793",
-    "(for International Transfers)",
-    "Account No #: 07810111367793 (for Local",
-    "Transfers)",
+    "IBAN#: PK71MEZN0007810111367793",
+    "(International Transfers)",
+    "A/C #: 07810111367793 (Local)",
     "Branch Code: 0781",
-    "Bank Address: Meezan Bank Peshawar (Khyber",
-    "Bazar Branch)",
-    "Contact# +92 335 524 5551",
+    "Bank: Meezan Bank Peshawar",
+    "(Khyber Bazar Branch)",
+    "Contact: +92 335 524 5551",
   ];
   let lineY = y + 4;
   for (const line of col1Lines) {
     doc.text(line, col1X, lineY);
-    lineY += 3.2;
+    lineY += 3.5;
   }
 
+  // Column 2
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
+  doc.setTextColor(30, 30, 30);
   doc.text("IVSGLOBAL", col2X, y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
+  doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
   const col2Lines = [
-    "Account Title: Ivs Global",
     "Bank Name: Mashreq Bank",
     "IBAN: AE620330000019101455931",
-    "Account Number: 019101455931",
-    "Mobile number +971528838128",
+    "A/C Number: 019101455931",
+    "Mobile: +971528838128",
     "Beneficiary Address:",
-    "Ajman Industrial Area 2, Ajman, UAE",
+    "Ajman Industrial Area 2,",
+    "Ajman, UAE",
   ];
   lineY = y + 4;
   for (const line of col2Lines) {
     doc.text(line, col2X, lineY);
-    lineY += 3.2;
+    lineY += 3.5;
   }
 
+  // Column 3 (QR Code)
   try {
     const scanImg = await urlToDataUrl(SCAN_URL);
     const { w, h } = await getImageSize(scanImg);
     const scanH = 28;
     const scanW = scanH * (w / h);
-    doc.addImage(scanImg, detectImgFormat(scanImg), col3X, y - 1, scanW, scanH);
+    // Aligning image to the right margin perfectly
+    doc.addImage(scanImg, detectImgFormat(scanImg), col3X - scanW, y - 2, scanW, scanH);
   } catch (e) {
     console.error("Scan image failed", e);
   }
 
-  y += 32;
+  y += 35; // Space below payment info
 
   // ===== Instructions + Stamp/Signature =====
   y = ensureSpace(doc, y, 80);
 
-  doc.setFont("helvetica", "bolditalic");
-  doc.setFontSize(11);
-  doc.setTextColor(0, 0, 0);
-  doc.text("Instructions:", 15, y);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.text("Instructions:", MARGIN, y);
   y += 6;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
+  doc.setTextColor(50, 50, 50);
 
   const instrItems = [
     {
@@ -522,35 +499,36 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
   ];
 
   const instrStartY = y;
-  const instrMaxW = 105;
+  const instrMaxW = 115; // Increased text width area
 
   for (const item of instrItems) {
     if (item.tick) {
-      doc.setTextColor(0, 120, 0);
+      doc.setTextColor(0, 150, 75); // Premium green
       doc.setFont("helvetica", "bold");
-      doc.text("✓", 17, y);
+      doc.text("✓", MARGIN + 2, y);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(50, 50, 50);
     }
 
     const wrapped = doc.splitTextToSize(item.text, instrMaxW);
-    doc.text(wrapped, 22, y);
-    y += wrapped.length * 3.5 + 1.5;
+    doc.text(wrapped, MARGIN + 7, y);
+    y += wrapped.length * 3.5 + 2;
   }
 
+  // Stamp aligned to the right perfectly
   try {
     const stampImg = await urlToDataUrl(STAMP_URL);
     const fmt = detectImgFormat(stampImg);
-    const stampW = 52;
-    const stampH = 55;
-    const stampX = 145;
+    const stampW = 45; // Slightly reduced scale for neatness
+    const stampH = 48;
+    const stampX = PAGE_W - MARGIN - stampW;
     const instrHeight = y - instrStartY;
     const stampY = instrStartY + Math.max(0, (instrHeight - stampH) / 2);
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(DARK_BLUE[0], DARK_BLUE[1], DARK_BLUE[2]);
-    doc.text("Account Manager IVS", stampX + stampW / 2, stampY - 3, { align: "center" });
+    doc.setFontSize(8);
+    doc.setTextColor(TEXT_GRAY[0], TEXT_GRAY[1], TEXT_GRAY[2]);
+    doc.text("Authorized Signature", stampX + stampW / 2, stampY - 3, { align: "center" });
     doc.addImage(stampImg, fmt, stampX, stampY, stampW, stampH);
   } catch (e) {
     console.error("Stamp/signature failed", e);
