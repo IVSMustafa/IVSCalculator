@@ -42,52 +42,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
       "pricingType": "class",
       "grades": [
         {
-          "id": "fs1-fs3",
-          "name": "FS1 to FS3",
-          "fee": 215,
+          "id": "fs1",
+          "name": "FS1 ",
+          "fee": 245,
           "discountedFee": 195
-        },
-        {
-          "id": "grade-1-3",
-          "name": "Grade 1-3",
-          "fee": 275,
-          "discountedFee": 235
-        },
-        {
-          "id": "grade-4-6",
-          "name": "Grade 4-6",
-          "fee": 325,
-          "discountedFee": 275
-        },
-        {
-          "id": "grade-7",
-          "name": "Grade 7",
-          "fee": 375,
-          "discountedFee": 335
-        },
-        {
-          "id": "grade-8-10-fed",
-          "name": "Grade 8-10 (Fed)",
-          "fee": 375,
-          "discountedFee": 335
-        },
-        {
-          "id": "grade-11-12-fed",
-          "name": "Grade 11-12 (Fed)",
-          "fee": 430,
-          "discountedFee": 375
-        },
-        {
-          "id": "grade-8-9",
-          "name": "Grade 8-9",
-          "fee": 430,
-          "discountedFee": 375
-        },
-        {
-          "id": "grade-10",
-          "name": "Grade 10",
-          "fee": 480,
-          "discountedFee": 415
         }
       ]
     },
