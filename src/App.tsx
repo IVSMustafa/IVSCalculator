@@ -11,7 +11,22 @@ import { Settings, Calculator, Coins, ShieldAlert } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'calculator' | 'settings'>('calculator');
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    const saved = sessionStorage.getItem('iqra_current_settings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return DEFAULT_SETTINGS;
+      }
+    }
+    return DEFAULT_SETTINGS;
+  });
+
+  // Save to session storage on every change
+  useEffect(() => {
+    sessionStorage.setItem('iqra_current_settings', JSON.stringify(settings));
+  }, [settings]);
 
   useEffect(() => {
     const fetchRates = async () => {

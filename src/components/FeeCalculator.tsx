@@ -1224,38 +1224,51 @@ export default function FeeCalculator({ settings }: { settings: AppSettings }) {
                   </div>
                 )}
 
+                {/* Subtotal Selection */}
+                <div className="flex justify-between items-center text-sm pt-2">
+                  <div className="flex flex-col">
+                    <span className="text-slate-800 font-semibold italic">Subtotal</span>
+                    {settings.selectedCurrency !== 'SAR' && (
+                      <span className="text-[10px] text-slate-500 font-medium">({totalRegularFee.toFixed(2)} SAR regular subtotal)</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-slate-800 font-bold">{formatV(totalRegularFee)}</span>
+                  </div>
+                </div>
+
                 {(siblingDiscountAmount > 0 || multiProgramDiscountAmount > 0 || fixedDiscount > 0) && (
-                  <div className="pt-2 space-y-2">
+                  <div className="pt-2 space-y-2 border-t border-slate-100 mt-2">
                     {siblingDiscountAmount > 0 && (
-                      <div className="flex justify-between items-center text-sm text-blue-600 bg-blue-50 p-2 rounded-lg border border-blue-100">
-                        <span>Sibling Discount ({siblingDiscount}%)</span>
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex flex-col">
+                          <span className="text-blue-700 font-semibold">Multiple Student Discount</span>
+                          <span className="text-[10px] text-blue-600 font-medium">({siblingDiscount}% sibling discount | -{siblingDiscountAmount.toFixed(2)} SAR)</span>
+                        </div>
                         <div className="flex flex-col items-end">
-                          <span className="font-bold">-{formatV(siblingDiscountAmount)}</span>
-                          {settings.selectedCurrency !== 'SAR' && (
-                            <span className="text-[10px] text-blue-500 font-medium">(-{siblingDiscountAmount.toFixed(2)} SAR)</span>
-                          )}
+                          <span className="text-blue-700 font-bold">-{formatV(siblingDiscountAmount)}</span>
                         </div>
                       </div>
                     )}
                     {multiProgramDiscountAmount > 0 && (
-                      <div className="flex justify-between items-center text-sm text-emerald-600 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-                        <span>Multi-Program Discount ({multiProgramDiscount}%)</span>
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex flex-col">
+                          <span className="text-emerald-700 font-semibold">Multi-Program Discount</span>
+                          <span className="text-[10px] text-emerald-600 font-medium">({multiProgramDiscount}% scholarship | -{multiProgramDiscountAmount.toFixed(2)} SAR)</span>
+                        </div>
                         <div className="flex flex-col items-end">
-                          <span className="font-bold">-{formatV(multiProgramDiscountAmount)}</span>
-                          {settings.selectedCurrency !== 'SAR' && (
-                            <span className="text-[10px] text-emerald-500 font-medium">(-{multiProgramDiscountAmount.toFixed(2)} SAR)</span>
-                          )}
+                          <span className="text-emerald-700 font-bold">-{formatV(multiProgramDiscountAmount)}</span>
                         </div>
                       </div>
                     )}
                     {fixedDiscount > 0 && (
-                      <div className="flex justify-between items-center text-sm text-green-600 bg-green-50 p-2 rounded-lg border border-green-100">
-                        <span>Fixed Discount</span>
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex flex-col">
+                          <span className="text-green-700 font-semibold">Additional Fixed Discount</span>
+                          <span className="text-[10px] text-green-600 font-medium">({fixedDiscount.toFixed(2)} SAR)</span>
+                        </div>
                         <div className="flex flex-col items-end">
-                          <span className="font-bold">-{formatV(fixedDiscount)}</span>
-                          {settings.selectedCurrency !== 'SAR' && (
-                            <span className="text-[10px] text-green-500 font-medium">(-{fixedDiscount.toFixed(2)} SAR)</span>
-                          )}
+                          <span className="text-green-700 font-bold">-{formatV(fixedDiscount)}</span>
                         </div>
                       </div>
                     )}
@@ -1272,13 +1285,10 @@ export default function FeeCalculator({ settings }: { settings: AppSettings }) {
                       <div className="flex justify-between items-center text-sm bg-green-50 border border-green-200 p-2.5 rounded-lg">
                         <div className="flex flex-col">
                           <span className="text-green-700 font-semibold">🎉 Total Savings</span>
-                          <span className="text-[10px] text-green-600 font-medium">({savingsPercent.toFixed(1)}% of regular fee)</span>
+                          <span className="text-[10px] text-green-600 font-medium">({savingsPercent.toFixed(1)}% of regular fee | {allSavings.toFixed(2)} SAR)</span>
                         </div>
                         <div className="flex flex-col items-end">
                           <span className="text-green-700 font-bold text-base">-{formatV(allSavings)}</span>
-                          {settings.selectedCurrency !== 'SAR' && (
-                            <span className="text-[10px] text-green-600 font-medium">(-{allSavings.toFixed(2)} SAR)</span>
-                          )}
                         </div>
                       </div>
                     </div>

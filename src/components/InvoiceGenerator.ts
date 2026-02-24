@@ -36,9 +36,9 @@ interface InvoiceData {
 }
 
 
-const HEADER_URL = "public/templates/Header.jpg";
-const SCAN_URL = "/templates/Scan to pay.jpg";
-const STAMP_URL = "/templates/Stamp and signature.jpg";
+const HEADER_URL = "templates/Header.jpg";
+const SCAN_URL = "templates/Scan%20to%20pay.jpg";
+const STAMP_URL = "templates/Stamp%20and%20signature.jpg";
 
 const NAVY: [number, number, number] = [41, 58, 128];
 const DARK_BLUE: [number, number, number] = [25, 40, 100];
@@ -251,12 +251,15 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
     (data.registrationEntries || []).reduce((sum, r) => sum + r.fullFee, 0);
 
   if (data.programDiscountAmount > 0) {
-    rows.push(["", "Program Discount", "", "", "", "", `-${formatC(data.programDiscountAmount)}`]);
+    const txt = `-${formatC(data.programDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.programDiscountAmount.toFixed(2)} SAR)` : ''}`;
+    rows.push(["", "Program Discount", "", "", "", "", txt]);
   }
   if (data.customDiscountAmount > 0) {
-    rows.push(["", "Individual Discounts", "", "", "", "", `-${formatC(data.customDiscountAmount)}`]);
+    const txt = `-${formatC(data.customDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.customDiscountAmount.toFixed(2)} SAR)` : ''}`;
+    rows.push(["", "Individual Discounts", "", "", "", "", txt]);
   }
   if (data.enrollmentDiscountAmount > 0) {
+    const txt = `-${formatC(data.enrollmentDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.enrollmentDiscountAmount.toFixed(2)} SAR)` : ''}`;
     rows.push([
       "",
       "Enrollment Discount\n(Sibling + Multi-Program)",
@@ -264,11 +267,12 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
       "",
       "",
       "",
-      `-${formatC(data.enrollmentDiscountAmount)}`,
+      txt,
     ]);
   }
   if (data.fixedDiscountAmount > 0) {
-    rows.push(["", "Fixed Discount", "", "", "", "", `-${formatC(data.fixedDiscountAmount)}`]);
+    const txt = `-${formatC(data.fixedDiscountAmount)}${data.currency !== 'SAR' ? `\n(-${data.fixedDiscountAmount.toFixed(2)} SAR)` : ''}`;
+    rows.push(["", "Fixed Discount", "", "", "", "", txt]);
   }
 
   const totalSavings = normalTotal - data.finalAmount;
@@ -293,13 +297,17 @@ export const generateInvoicePDF = async (data: InvoiceData) => {
       },
     ]);
 
+    const normalTotalBase = formatC(normalTotal);
+    const normalTotalExtra = data.currency !== "SAR" ? `\n(${normalTotal.toFixed(2)} SAR)` : "";
+    const normalTotalTxt = `${normalTotalBase}${normalTotalExtra}`;
+
     rows.push([
       {
         content: "Total (Without Discount)",
         colSpan: 6,
         styles: { fontStyle: "bold", halign: "left" },
       },
-      { content: formatC(normalTotal), styles: { fontStyle: "bold", halign: "right" } },
+      { content: normalTotalTxt, styles: { fontStyle: "bold", halign: "right" } },
     ]);
   }
 

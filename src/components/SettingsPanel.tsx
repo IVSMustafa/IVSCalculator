@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppSettings, Program, GradeFee } from '../types';
-import { Building2, Phone, Mail, Globe, Image as ImageIcon, BookOpen, Plus, Trash2, Lock, Unlock, ShieldAlert } from 'lucide-react';
+import { Building2, Phone, Mail, Globe, Image as ImageIcon, BookOpen, Plus, Trash2, Lock, Unlock, ShieldAlert, HelpCircle, Database, CloudLightning, ShieldCheck, ShieldQuestion } from 'lucide-react';
 
 interface Props {
   settings: AppSettings;
@@ -163,20 +163,64 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
     }
   };
 
+  const handleExportJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(settings, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `IQRA_Settings_Backup_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const imported = JSON.parse(event.target?.result as string);
+          setSettings(imported);
+          alert('Settings imported successfully! (Session only - Save Permanently if desired)');
+        } catch (err) {
+          alert('Error importing JSON. Please check file format.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 pb-20">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 text-sm font-medium">
-          <Unlock className="w-4 h-4" />
-          Live Source Editor Mode
+      <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 text-blue-600 font-semibold">
+            <Unlock className="w-4 h-4" />
+            Live Settings Editor
+          </div>
+          <p className="text-[10px] text-slate-500">Changes are saved into your current session automatically.</p>
         </div>
-        <button
-          onClick={handleLock}
-          className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-red-600 transition-colors bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm"
-        >
-          <Lock className="w-4 h-4" />
-          Lock Settings
-        </button>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-blue-600 cursor-pointer transition-colors bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+            <Globe className="w-3.5 h-3.5" />
+            Import Backup
+            <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
+          </label>
+          <button
+            onClick={handleExportJSON}
+            className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors bg-slate-50 px-3 py-2 rounded-lg border border-slate-200"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            Download Backup
+          </button>
+          <button
+            onClick={handleLock}
+            className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-red-600 transition-colors bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            Lock
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
@@ -370,50 +414,77 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
         </div>
       </div>
 
-      <div className="bg-blue-900 rounded-2xl p-8 text-white shadow-xl space-y-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-10">
-          <BookOpen className="w-32 h-32" />
+      {/* Global Sync Section */}
+      <div className="bg-blue-900 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden border border-blue-400/30">
+        <div className="absolute top-0 right-0 p-6 opacity-5 rotate-12">
+          <Globe className="w-48 h-48" />
         </div>
 
-        <div className="relative z-10 flex items-start gap-4">
-          <div className={`p-3 rounded-xl ${syncStatus === 'success' ? 'bg-green-500' : syncStatus === 'error' ? 'bg-red-500' : 'bg-blue-600'}`}>
-            {syncStatus === 'success' ? <Plus className="w-6 h-6 rotate-45" /> : syncStatus === 'error' ? <ShieldAlert className="w-6 h-6" /> : <BookOpen className="w-6 h-6" />}
+        <div className="relative z-10 space-y-8">
+          <div className="flex items-start gap-6">
+            <div className={`p-4 rounded-2xl shadow-inner ${syncStatus === 'success' ? 'bg-green-500/20 border border-green-400/30' : 'bg-white/10 border border-white/20'}`}>
+              <Database className={`w-8 h-8 ${syncStatus === 'success' ? 'text-green-400' : 'text-blue-200'}`} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-black tracking-tight">Sync to Global Website</h3>
+              <p className="text-blue-100/80 mt-2 text-lg leading-relaxed max-w-2xl">
+                {syncStatus === 'success'
+                  ? 'Changes saved to your global configuration! Now follow the deploy steps to update all mobile phones and other computers.'
+                  : 'To see these changes on every device (Mobile, Other PCs), you must embed them into the global source code and then publish to GitHub.'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold">Save Permanently to Source Code</h3>
-            <p className="text-blue-100 mt-1">
-              {syncStatus === 'success'
-                ? 'Changes have been saved to src/types.ts successfully!'
-                : syncStatus === 'error'
-                  ? 'Failed to save changes. Please check if the dev server is running.'
-                  : 'This will overwrite the default settings in your source code with these current values.'}
-            </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+            <div className="lg:col-span-3">
+              <button
+                onClick={handleSyncToCode}
+                disabled={isSyncing}
+                className={`w-full font-black py-6 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-4 text-xl ${syncStatus === 'success'
+                  ? 'bg-green-500 hover:bg-green-600 text-white'
+                  : syncStatus === 'error'
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-white text-blue-900 hover:brightness-110 active:scale-[0.98]'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isSyncing ? (
+                  <div className="w-8 h-8 border-4 border-blue-900/20 border-t-blue-900 rounded-full animate-spin"></div>
+                ) : syncStatus === 'success' ? (
+                  <>
+                    <Unlock className="w-6 h-6" />
+                    Updated Successfully ✓
+                  </>
+                ) : (
+                  <>
+                    <CloudLightning className="w-6 h-6" />
+                    Save & Sync Globally
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="lg:col-span-2 bg-blue-800/40 backdrop-blur-md border border-blue-400/30 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center gap-2 text-blue-200 font-bold text-sm">
+                <ShieldCheck className="w-4 h-4" />
+                DASHBOARD DEPLOYMENT STEPS:
+              </div>
+              <ol className="text-xs text-blue-100/70 space-y-2 font-mono">
+                <li className="flex gap-2">
+                  <span className="text-blue-400 font-bold">1.</span>
+                  Click "Save & Sync" above
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-blue-400 font-bold">2.</span>
+                  In your terminal: <code className="bg-blue-900/50 px-1 rounded text-blue-200">git push</code>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-blue-400 font-bold">3.</span>
+                  Run: <code className="bg-blue-900/50 px-1 rounded text-blue-200">npm run deploy</code>
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
-
-        <button
-          onClick={handleSyncToCode}
-          disabled={isSyncing}
-          className={`relative z-10 w-full font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 ${syncStatus === 'success'
-            ? 'bg-green-500 hover:bg-green-600'
-            : syncStatus === 'error'
-              ? 'bg-red-500 hover:bg-red-600'
-              : 'bg-white text-blue-900 hover:bg-blue-50'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          {isSyncing ? (
-            <div className="w-6 h-6 border-4 border-blue-900/20 border-t-blue-900 rounded-full animate-spin"></div>
-          ) : syncStatus === 'success' ? (
-            'Saved Successfully! ✓'
-          ) : syncStatus === 'error' ? (
-            'Try Again'
-          ) : (
-            <>
-              <Plus className="w-5 h-5" />
-              Embed Changes into Source Code
-            </>
-          )}
-        </button>
       </div>
     </div>
   );
