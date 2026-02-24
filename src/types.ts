@@ -49,13 +49,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
         },
         {
           "id": "grade - 1771934483570 ",
-          "name": "FS1",
+          "name": "FS2",
           "fee": 245,
           "discountedFee": 195
         },
         {
           "id": "grade - 1771934526713 ",
-          "name": "FS1",
+          "name": "FS3",
           "fee": 245,
           "discountedFee": 195
         },
