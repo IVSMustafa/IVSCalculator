@@ -36,7 +36,7 @@ interface InvoiceData {
 }
 
 
-const HEADER_URL = "public/templates/Header.jpg";
+const HEADER_URL = public/templates/Header.jpg;
 const SCAN_URL = "/templates/Scan to pay.jpg";
 const STAMP_URL = "/templates/Stamp and signature.jpg";
 
