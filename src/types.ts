@@ -46,6 +46,108 @@ export const DEFAULT_SETTINGS: AppSettings = {
           "name": "FS1 ",
           "fee": 245,
           "discountedFee": 195
+        },
+        {
+          "id": "grade - 1771934483570 ",
+          "name": "FS1",
+          "fee": 245,
+          "discountedFee": 195
+        },
+        {
+          "id": "grade - 1771934526713 ",
+          "name": "FS1",
+          "fee": 245,
+          "discountedFee": 195
+        },
+        {
+          "id": "grade - 1771934531330 ",
+          "name": "Grade 1",
+          "fee": 295,
+          "discountedFee": 235
+        },
+        {
+          "id": "grade - 1771934542610 ",
+          "name": "Grade 2",
+          "fee": 295,
+          "discountedFee": 235
+        },
+        {
+          "id": "grade - 1771934546266 ",
+          "name": "Grade 3",
+          "fee": 295,
+          "discountedFee": 235
+        },
+        {
+          "id": "grade - 1771934550098 ",
+          "name": "Grade 4",
+          "fee": 345,
+          "discountedFee": 275
+        },
+        {
+          "id": "grade - 1771934553338 ",
+          "name": "Grade 5",
+          "fee": 345,
+          "discountedFee": 275
+        },
+        {
+          "id": "grade - 1771934559417 ",
+          "name": "Grade 6",
+          "fee": 345,
+          "discountedFee": 275
+        },
+        {
+          "id": "grade - 1771934565306 ",
+          "name": "Grade 7",
+          "fee": 400,
+          "discountedFee": 335
+        },
+        {
+          "id": "grade - 1771934570562 ",
+          "name": "Grade 8 (Fed)",
+          "fee": 400,
+          "discountedFee": 335
+        },
+        {
+          "id": "grade - 1771934579057 ",
+          "name": "Grade 9 (Fed)",
+          "fee": 400,
+          "discountedFee": 335
+        },
+        {
+          "id": "grade - 1771934588730 ",
+          "name": "Grade 10 (Fed)",
+          "fee": 400,
+          "discountedFee": 335
+        },
+        {
+          "id": "grade - 1771934595393 ",
+          "name": "Grade 11 (Fed)",
+          "fee": 450,
+          "discountedFee": 375
+        },
+        {
+          "id": "grade - 1771934649474 ",
+          "name": "Grade 12 (Fed)",
+          "fee": 450,
+          "discountedFee": 375
+        },
+        {
+          "id": "grade - 1771934656361 ",
+          "name": "Grade 8 (IGCSE/O Level's)",
+          "fee": 450,
+          "discountedFee": 375
+        },
+        {
+          "id": "grade - 1771934682698 ",
+          "name": "Grade 9 (IGCSE/O Level's)",
+          "fee": 450,
+          "discountedFee": 375
+        },
+        {
+          "id": "grade - 1771934686985 ",
+          "name": "Grade 10 (IGCSE/O Level's)",
+          "fee": 500,
+          "discountedFee": 415
         }
       ]
     },
@@ -55,39 +157,123 @@ export const DEFAULT_SETTINGS: AppSettings = {
       "pricingType": "subject",
       "grades": [
         {
-          "id": "1on1-kg1-gr2",
-          "name": "Kg 1 - Grade 2",
-          "fee": 120,
+          "id": "1on1-fs1",
+          "name": "FS1",
+          "fee": 140,
           "discountedFee": 120
         },
         {
-          "id": "1on1-gr3-gr7",
-          "name": "Grade 3 - Grade 7",
-          "fee": 130,
+          "id": "1on1-fs2",
+          "name": "FS2",
+          "fee": 140,
+          "discountedFee": 120
+        },
+        {
+          "id": "1on1-fs3",
+          "name": "FS3",
+          "fee": 140,
+          "discountedFee": 120
+        },
+        {
+          "id": "1on1-gr1",
+          "name": "Grade 1",
+          "fee": 140,
+          "discountedFee": 120
+        },
+        {
+          "id": "1on1-gr2",
+          "name": "Grade 2",
+          "fee": 140,
+          "discountedFee": 120
+        },
+        {
+          "id": "1on1-gr3",
+          "name": "Grade 3",
+          "fee": 150,
           "discountedFee": 130
         },
         {
-          "id": "1on1-gr8-gr9-fed",
-          "name": "Grade 8 & 9 Fed",
-          "fee": 140,
+          "id": "1on1-gr4",
+          "name": "Grade 4",
+          "fee": 150,
+          "discountedFee": 130
+        },
+        {
+          "id": "1on1-gr5",
+          "name": "Grade 5",
+          "fee": 150,
+          "discountedFee": 130
+        },
+        {
+          "id": "1on1-gr6",
+          "name": "Grade 6",
+          "fee": 150,
+          "discountedFee": 130
+        },
+        {
+          "id": "1on1-gr7",
+          "name": "Grade 7",
+          "fee": 150,
+          "discountedFee": 130
+        },
+        {
+          "id": "1on1-gr8-fed",
+          "name": "Grade 8 Fed",
+          "fee": 160,
           "discountedFee": 140
         },
         {
-          "id": "1on1-gr10-gr12-fed",
-          "name": "Grade 10 & 12 Fed",
-          "fee": 150,
+          "id": "1on1-gr9-fed",
+          "name": "Grade 9 Fed",
+          "fee": 160,
+          "discountedFee": 140
+        },
+        {
+          "id": "1on1-gr10-fed",
+          "name": "Grade 10 Fed",
+          "fee": 170,
+          "discountedFee": 150
+        },
+        {
+          "id": "1on1-gr11-fed",
+          "name": "Grade 11 Fed",
+          "fee": 170,
+          "discountedFee": 150
+        },
+        {
+          "id": "1on1-gr12-fed",
+          "name": "Grade 12 Fed",
+          "fee": 170,
           "discountedFee": 150
         },
         {
           "id": "1on1-gr8-igcse",
           "name": "Grade 8 IGCSE",
-          "fee": 180,
+          "fee": 200,
           "discountedFee": 180
         },
         {
-          "id": "1on1-gr9-gr12-igcse",
-          "name": "Grade 9 - 12 IGCSE",
-          "fee": 250,
+          "id": "1on1-gr9-igcse",
+          "name": "Grade 9 IGCSE",
+          "fee": 280,
+          "discountedFee": 250
+        },
+        {
+          "id": "1on1-gr10-igcse",
+          "name": "Grade 10 IGCSE",
+          "fee": 280,
+          "discountedFee": 250
+        },
+        {
+          "id": "1on1-gr11-igcse",
+          "name": "Grade 11 IGCSE",
+          "fee": 280,
+          "discountedFee": 250
+        },
+        {
+          "id": "1on1-gr12-igcse",
+          "name": "Grade 12 IGCSE",
+          "fee": 280,
           "discountedFee": 250
         }
       ]
@@ -107,19 +293,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
           "id": "quran-hifz",
           "name": "Hifz",
           "fee": 150,
-          "discountedFee": 120
-        }
-      ]
-    },
-    {
-      "id": "prog-1771836957406",
-      "name": "Crash",
-      "pricingType": "days",
-      "grades": [
-        {
-          "id": "grade-1771836969583",
-          "name": "Garad 9",
-          "fee": 120,
           "discountedFee": 120
         }
       ]
