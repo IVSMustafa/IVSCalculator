@@ -100,6 +100,13 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
     setPasswordInput('');
   };
 
+  const handleResetSettings = () => {
+    if (window.confirm('This will discard your current unsaved browser changes and reload all values directly from the Website Source Code. Continue?')) {
+      sessionStorage.removeItem('iqra_current_settings');
+      window.location.reload();
+    }
+  };
+
   if (!isAuthorized) {
     return (
       <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-xl border border-slate-200">
@@ -214,6 +221,14 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
             Download Backup
           </button>
           <button
+            onClick={handleResetSettings}
+            className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-orange-600 transition-colors bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm"
+            title="Reload settings directly from types.ts"
+          >
+            <CloudLightning className="w-3.5 h-3.5" />
+            Restore from Code
+          </button>
+          <button
             onClick={handleLock}
             className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-red-600 transition-colors bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm"
           >
@@ -311,8 +326,8 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                     onClick={handleSyncToCode}
                     disabled={isSyncing}
                     className={`flex items - center gap - 2 text - xs font - bold px - 3 py - 1.5 rounded - lg transition - all shadow - sm ${syncStatus === 'success'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-green-500 text-white'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                       } disabled: opacity - 50`}
                     title="Save this change to Global Website"
                   >
@@ -455,10 +470,10 @@ export default function SettingsPanel({ settings, setSettings }: Props) {
                 onClick={handleSyncToCode}
                 disabled={isSyncing}
                 className={`w - full font - black py - 6 rounded - 2xl transition - all shadow - xl flex items - center justify - center gap - 4 text - xl ${syncStatus === 'success'
-                    ? 'bg-green-500 hover:bg-green-600 text-white'
-                    : syncStatus === 'error'
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : 'bg-white text-blue-900 hover:brightness-110 active:scale-[0.98]'
+                  ? 'bg-green-500 hover:bg-green-600 text-white'
+                  : syncStatus === 'error'
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-white text-blue-900 hover:brightness-110 active:scale-[0.98]'
                   } disabled: opacity - 50 disabled: cursor - not - allowed`}
               >
                 {isSyncing ? (
