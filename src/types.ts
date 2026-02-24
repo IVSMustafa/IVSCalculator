@@ -286,14 +286,14 @@ export const DEFAULT_SETTINGS: AppSettings = {
         {
           "id": "quran-basic",
           "name": "Basic Qaida",
-          "fee": 100,
-          "discountedFee": 80
+          "fee": 22,
+          "discountedFee": 22
         },
         {
           "id": "quran-hifz",
           "name": "Hifz",
-          "fee": 150,
-          "discountedFee": 120
+          "fee": 22,
+          "discountedFee": 22
         }
       ]
     }
